@@ -1,0 +1,10 @@
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\obj\Debug\netcoreapp2.0\Magus.csproj.CoreCompileInputs.cache
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\obj\Debug\netcoreapp2.0\Magus.AssemblyInfoInputs.cache
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\obj\Debug\netcoreapp2.0\Magus.AssemblyInfo.cs
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\bin\Debug\netcoreapp2.0\Magus.deps.json
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\bin\Debug\netcoreapp2.0\Magus.runtimeconfig.json
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\bin\Debug\netcoreapp2.0\Magus.runtimeconfig.dev.json
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\bin\Debug\netcoreapp2.0\Magus.dll
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\bin\Debug\netcoreapp2.0\Magus.pdb
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\obj\Debug\netcoreapp2.0\Magus.dll
+c:\Users\vipbj\Work Folders\Privat shit\Magus\Magus\obj\Debug\netcoreapp2.0\Magus.pdb
