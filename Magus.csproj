@@ -206,5 +206,8 @@
     <Content Include="Shaders\sprite.frag" />
     <Content Include="Shaders\white.vert" />
     <Content Include="Shaders\white.frag" />
+    <Content Include="items.cs" />
+    <Content Include="Character.cs" />
+    <Content Include="Characters.cs" />
   </ItemGroup>
 </Project>

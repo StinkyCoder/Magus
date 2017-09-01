@@ -16,7 +16,7 @@ namespace Magus
     {
         private GameWindow window = null;
         private OpenTK.RectangleF CurrentView = new OpenTK.RectangleF(0, 0, 800, 600);
-
+        private double time = 0.0f;
         private int ibo_elements;
         private Dictionary<string, int> textures = new Dictionary<string, int>();
         private List<Sprite> sprites = new List<Sprite>();
@@ -48,27 +48,52 @@ namespace Magus
         }
 
         private void OnkeyDown(object sender, KeyboardKeyEventArgs e ){
+             // Quit if requested
             if(e.Key == Key.Escape){
                 this.window.Exit();
+            }
+            // Move view based on key input
+            float moveSpeed = 50.0f * ((e.Key == Key.ShiftLeft || e.Key ==Key.ShiftRight) ? 3.0f : 1.0f); // Hold shift to move 3 times faster!
+
+            // Up-down movement
+            if (e.Key == Key.Up)
+            {
+                CurrentView.Y += moveSpeed * (float) time;
+            }
+            else if (e.Key == Key.Down)
+            {
+                CurrentView.Y -= moveSpeed * (float) time;
+            }
+
+            // Left-right movement
+            if (e.Key == Key.Left)
+            {
+                CurrentView.X -= moveSpeed * (float) time;
+            }
+            else if (e.Key == Key.Right)
+            {
+                CurrentView.X += moveSpeed * (float) time;
             }
         }
     
         private void OnLoad(object sender,EventArgs e){
 
             GL.ClearColor(OpenTK.Graphics.Color4.CornflowerBlue);
-            GL.Viewport(0, 0, this.window.Width, this.window.Height);
+            GL.Viewport(0, 0, this.window.Width, this.window.Height);  
 
             // Load textures from files
-            textures.Add("opentksquare", loadImage(".\\Resources\\magus.art0.png"));
+            textures.Add("opentksquare", loadImage(".\\Resources\\world.mgs0.png"));
             textures.Add("opentksquare2", loadImage(".\\Resources\\magus.art1.png"));
             textures.Add("opentksquare3", loadImage(".\\Resources\\magus.art2.png"));
 
-            // Create a lot of sprites
-            for (int i = 0; i < 30000; i++)
-            {
-                addSprite();
-            }
+             Sprite s = new Sprite(textures.ElementAt(0).Value, 1000, 1000);
+            s.Position = new Vector2(0, 0);
+            //s.Size =new OpenTK.SizeF(280, 280);
+            s.Size =new OpenTK.SizeF(4800, 6720);
+            s.Rotation = 0;
 
+            sprites.Add(s);
+      
             // Load shaders
             shaders.Add(new ShaderProgram(".\\Shaders\\sprite.vert", ".\\Shaders\\sprite.frag", true)); // Normal sprite
             shaders.Add(new ShaderProgram(".\\Shaders\\white.vert", ".\\Shaders\\white.frag", true)); // Just draws the whole sprite white
@@ -80,24 +105,7 @@ namespace Magus
             // Enable blending based on the texture alpha
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-        }
-
-        /// <summary>
-        /// Creates a new sprite with a random texture and transform
-        /// </summary>
-        private void addSprite()
-        {
-            // Assign random texture
-            Sprite s = new Sprite(textures.ElementAt(r.Next(0, textures.Count)).Value, 50, 50);
-
-            // Transform sprite randomly
-            s.Position = new Vector2(r.Next(-8000, 8000), r.Next(-6000, 6000));
-            float scale = 300.0f * (float) r.NextDouble() + 0.5f;
-            s.Size = new OpenTK.SizeF(scale, scale);
-            s.Rotation = (float) r.NextDouble() * 2.0f * 3.141f;
-
-            sprites.Add(s);
-        }
+        }     
 
         private  void OnRenderFrame(object seneder, FrameEventArgs e)
         {
@@ -135,57 +143,14 @@ namespace Magus
             }
         }
 
-        private  void OnResize(object sender,EventArgs e)
-        {
-            ortho = Matrix4.CreateOrthographic(this.window.ClientSize.Width, this.window.ClientSize.Height, -1.0f, 2.0f);
-            CurrentView.Size = new OpenTK.SizeF(this.window.ClientSize.Width, this.window.ClientSize.Height);
-        }
-
         private  void OnUpdateFrame(object sender,FrameEventArgs e)
         {
-
+            time = e.Time;
             // Update positions
-            Parallel.ForEach(sprites, delegate(Sprite s)
+           /* Parallel.ForEach(sprites, delegate(Sprite s)
             {
                 s.Position += new Vector2((float)(e.Time * s.Scale.X * Math.Cos(s.Rotation)), (float)(e.Time * s.Scale.Y * Math.Sin(s.Rotation)));
-            });
-
-            KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
-
-            // Quit if requested
-            if (keyboardState[Key.Escape])
-            {
-                this.window.Exit();
-            }
-
-            // Move view based on key input
-            float moveSpeed = 50.0f * ((keyboardState[Key.ShiftLeft] || keyboardState[Key.ShiftRight]) ? 3.0f : 1.0f); // Hold shift to move 3 times faster!
-
-            // Up-down movement
-            if (keyboardState[Key.Up])
-            {
-                CurrentView.Y += moveSpeed * (float) e.Time;
-            }
-            else if (keyboardState[Key.Down])
-            {
-                CurrentView.Y -= moveSpeed * (float) e.Time;
-            }
-
-            // Left-right movement
-            if (keyboardState[Key.Left])
-            {
-                CurrentView.X -= moveSpeed * (float) e.Time;
-            }
-            else if (keyboardState[Key.Right])
-            {
-                CurrentView.X += moveSpeed * (float) e.Time;
-            }
-
-            // Add sprites
-            if (keyboardState[Key.Plus])
-            {
-                addSprite();
-            }
+            });     */      
 
             // Update graphics
             List<Vector2> verts = new List<Vector2>();
@@ -231,51 +196,8 @@ namespace Magus
 
             // Display average FPS and sprite statistics in title bar
             avgfps = (avgfps + (1.0f / (float) e.Time)) / 2.0f;
-            this.window.Title = String.Format("OpenTK Sprite Demo ({0} sprites, {1} drawn, FPS:{2:0.00})", sprites.Count, viscount, avgfps);
+            this.window.Title = String.Format("Magus ({0} sprites, {1} drawn, FPS:{2:0.00})", sprites.Count, viscount, avgfps);
         }
-
-        /// <summary>
-        /// Loads a texture from a Bitmap
-        /// </summary>
-        /// <param name="image">Bitmap to make a texture from</param>
-        /// <returns>ID of texture, or -1 if there is an error</returns>
-        private int loadImage(System.Drawing.Bitmap image)
-        {
-            int texID = GL.GenTexture();
-
-            GL.BindTexture(TextureTarget.Texture2D, texID);
-            System.Drawing.Imaging.BitmapData  data = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-
-            image.UnlockBits(data);
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-
-            return texID;
-        }
-
-        /// <summary>
-        /// Overload to make a texture from a filename
-        /// </summary>
-        /// <param name="filename">File to make a texture from</param>
-        /// <returns>ID of texture, or -1 if there is an error</returns>
-        private int loadImage(string filename)
-        {
-            try
-            {
-                System.Drawing.Image file =  System.Drawing.Image.FromFile(filename);
-                return loadImage(new System.Drawing.Bitmap(file));
-            }
-            catch (FileNotFoundException e)
-            {
-                return -1;
-            }
-        }
-
         private  void OnMouseUp(object sender, MouseButtonEventArgs e)
         {
             // Selection example
@@ -333,5 +255,76 @@ namespace Magus
                 multishadermode ^= true;
             }
         }
+        private  void OnResize(object sender,EventArgs e)
+        {
+            ortho = Matrix4.CreateOrthographic(this.window.ClientSize.Width, this.window.ClientSize.Height, -1.0f, 2.0f);
+            CurrentView.Size = new OpenTK.SizeF(this.window.ClientSize.Width, this.window.ClientSize.Height);
+        }
+
+
+        #region "MEthods"
+
+        /// <summary>
+        /// Creates a new sprite with a random texture and transform
+        /// </summary>
+        private void addSprite()
+        {
+            // Assign random texture
+            Sprite s = new Sprite(textures.ElementAt(r.Next(0, textures.Count)).Value, 50, 50);
+
+            // Transform sprite randomly
+            s.Position = new Vector2(r.Next(-8000, 8000), r.Next(-6000, 6000));
+            float scale = 300.0f * (float) r.NextDouble() + 0.5f;
+            s.Size = new OpenTK.SizeF(scale, scale);
+            s.Rotation = (float) r.NextDouble() * 2.0f * 3.141f;
+
+            sprites.Add(s);
+        }
+
+        /// <summary>
+        /// Loads a texture from a Bitmap
+        /// </summary>
+        /// <param name="image">Bitmap to make a texture from</param>
+        /// <returns>ID of texture, or -1 if there is an error</returns>
+        private int loadImage(System.Drawing.Bitmap image)
+        {
+            int texID = GL.GenTexture();
+
+            GL.BindTexture(TextureTarget.Texture2D, texID);
+            System.Drawing.Imaging.BitmapData  data = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
+                System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+
+            image.UnlockBits(data);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+            return texID;
+        }
+
+        /// <summary>
+        /// Overload to make a texture from a filename
+        /// </summary>
+        /// <param name="filename">File to make a texture from</param>
+        /// <returns>ID of texture, or -1 if there is an error</returns>
+        private int loadImage(string filename)
+        {
+            try
+            {
+                System.Drawing.Image file =  System.Drawing.Image.FromFile(filename);
+                return loadImage(new System.Drawing.Bitmap(file));
+            }
+            catch (FileNotFoundException e)
+            {
+                return -1;
+            }
+        }
+
+
+        #endregion
+        
     }
 }
